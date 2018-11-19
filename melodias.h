@@ -1,5 +1,5 @@
 
-int marioMelodia[] = {
+const int marioMelodia[] = {
   NOTE_E7, NOTE_E7, 0, NOTE_E7,
   0, NOTE_C7, NOTE_E7, 0,
   NOTE_G7, 0, 0,  0,
@@ -26,34 +26,34 @@ int marioMelodia[] = {
   NOTE_D7, NOTE_B6, 0, 0
 };
 
-int marioTempo[] = {
-  120, 120, 120, 120,
-  120, 120, 120, 120,
-  120, 120, 120, 120,
-  120, 120, 120, 120,
-
-  120, 120, 120, 120,
-  120, 120, 120, 120,
-  120, 120, 120, 120,
-  120, 120, 120, 120,
-
-  160, 160, 160,
-  120, 120, 120, 120,
-  120, 120, 120, 120,
-  120, 120, 120, 120,
-
-  120, 120, 120, 120,
-  120, 120, 120, 120,
-  120, 120, 120, 120,
-  120, 120, 120, 120,
-
-  160, 160, 160,
-  120, 120, 120, 120,
-  120, 120, 120, 120,
-  120, 120, 120, 120,
+const int marioTempo[] = {
+  12, 12, 12, 12,
+  12, 12, 12, 12,
+  12, 12, 12, 12,
+  12, 12, 12, 12,
+ 
+  12, 12, 12, 12,
+  12, 12, 12, 12,
+  12, 12, 12, 12,
+  12, 12, 12, 12,
+ 
+  9, 9, 9,
+  12, 12, 12, 12,
+  12, 12, 12, 12,
+  12, 12, 12, 12,
+ 
+  12, 12, 12, 12,
+  12, 12, 12, 12,
+  12, 12, 12, 12,
+  12, 12, 12, 12,
+ 
+  9, 9, 9,
+  12, 12, 12, 12,
+  12, 12, 12, 12,
+  12, 12, 12, 12,
 };
 
-int underMelodia[] = {
+const int underMelodia[] = {
   NOTE_C4, NOTE_C5, NOTE_A3, NOTE_A4,
   NOTE_AS3, NOTE_AS4, 0,
   0,
@@ -75,7 +75,7 @@ int underMelodia[] = {
   0, 0, 0
 };
 
-int underTempo[] = {
+const int underTempo[] = {
   12, 12, 12, 12,
   12, 12, 6,
   3,
@@ -97,7 +97,7 @@ int underTempo[] = {
   3, 3, 3
 };
 
-int starWarsMelodia[] = {
+const int starWarsMelodia[] = {
   NOTE_A4, NOTE_A4, NOTE_A4,
   NOTE_F4, NOTE_C5, NOTE_A4,
   NOTE_F4, NOTE_C5, NOTE_A4,
@@ -109,14 +109,57 @@ int starWarsMelodia[] = {
   NOTE_F4, NOTE_C5, NOTE_A4,
 };
 
-int starWarsTempo[] = {
-  500, 500, 500,
-  350, 150, 500,
-  350, 150, 650,
+const int starWarsTempo[] = {
+  2, 2, 2,
+  3, 7, 2,
+  3, 7, 2,
   
-  500,
+  2,
   
-  500, 500, 500,
-  350, 150, 500,
-  350, 150, 650,
+  2, 2, 2,
+  3, 7, 2,
+  3, 7, 2,
+};
+
+const int peron[] = {
+  NOTE_E4, NOTE_C4, NOTE_A4, NOTE_E4,
+  NOTE_C4, NOTE_A4, NOTE_E4, NOTE_C4,
+  NOTE_E4, NOTE_C4, NOTE_A4, NOTE_E4, NOTE_E4,
+  NOTE_D4, NOTE_C4, NOTE_D4, NOTE_B4,
+};
+
+const int peronTempo[] = {
+  12, 12, 12, 12,
+  12, 12, 12, 12,
+  12, 12, 12, 6, 6,
+  12, 12, 12, 12,
+};
+
+const int despacito[] = {
+  NOTE_D5, NOTE_CS5, NOTE_B4, NOTE_FS4,
+  NOTE_NO, NOTE_FS4, NOTE_FS4, NOTE_FS4,
+  NOTE_FS4, NOTE_FS4, NOTE_B4, NOTE_B4,
+  NOTE_B4, NOTE_B4, NOTE_A4, NOTE_B4,  
+  NOTE_NO, NOTE_G4, NOTE_NO, NOTE_G4,
+  NOTE_G4, NOTE_G4, NOTE_G4, NOTE_G4,
+  NOTE_B4, NOTE_B4, NOTE_B4, NOTE_B4,
+  NOTE_CS5, NOTE_D5, NOTE_NO, NOTE_A4,
+  NOTE_NO, NOTE_A4, NOTE_A4, NOTE_A4,
+  NOTE_A4, NOTE_D5, NOTE_CS5, NOTE_D5,
+  NOTE_CS5, NOTE_D5, NOTE_D5, NOTE_E5,
+  NOTE_E5, NOTE_E5,
+};
+
+const int despacitoTempo[] = {
+  640, 640, 320, 160,
+  160, 160, 160, 160,
+  160, 160, 160, 160,
+  320, 160, 160, 320,
+  160, 160, 160, 160,
+  160, 160, 160, 160,
+  160, 160, 320, 160,
+  160, 320, 160, 160,
+  160, 160, 160, 160,
+  160, 160, 160, 160,
+  320, 160
 };

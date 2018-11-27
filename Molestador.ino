@@ -37,12 +37,13 @@ SoftwareSerial bluetooth(RX, TX);
 int minutoActual;
 int sonando = false;
 bool activo = false;
+bool androidStart = true;
 int desafio = BOTONES;
 int alarmID = -1;
 
 void setup() {
-  Serial.begin(9600);
-  bluetooth.begin(9600);
+  Serial.begin(38400);
+  bluetooth.begin(38400);
   tft.begin();
   tft.setRotation(3);
   setTime(0);
@@ -80,9 +81,7 @@ void loop() {
         desafioAndroid();
         break;
       case FIN:
-        tft.fillRect(0, 0, 320, 120, ILI9341_BLACK);
-        dibujarHora();
-        activo = false;
+        inactivar();
     }
   }
   Alarm.delay(0); // Necesario para que funcione la biblioteca de alarmas.
@@ -94,6 +93,10 @@ bool luzEstado = true;
 bool inicial = true;
 unsigned long bufferLuz = 0;
 
+// El sensor de luz devuelve valores entre 0 y 1023
+// Para cambiar de estado el sensor debe pasar el umbral de 800 o 200
+// según corresponda
+
 bool luzAlta() {
   if (inicial) {
     tft.drawBitmap(270, 0, lampara, 50, 50, ILI9341_GREEN);
@@ -101,7 +104,9 @@ bool luzAlta() {
   }
   bool toggle = false;
   int luz = Esplora.readLightSensor();
-  
+  if (luz > 999) {
+    luz = 999;
+  }
   if (luz < 200 && luzEstado) {
     tft.drawBitmap(270, 0, lampara, 50, 50, ILI9341_RED);
     luzEstado = false;
@@ -142,7 +147,9 @@ void dibujarTemp() {
 unsigned long tiempoDesdeNota = 0;
 int nota = 0;
 
-// @param melodia: Array de enteros  
+// @param melodia: Array de enteros que indica la nota a tocar
+// @param tempo: Array de enteros que indica el tempo de la nota a tocar
+// @param tam tamaño de los vectores de melodia o nota
 
 void sonar(int melodia[], int tempo[], int tam) {
   if(millis() - tiempoDesdeNota >= 1500 / tempo[nota]) {
@@ -156,6 +163,9 @@ void sonar(int melodia[], int tempo[], int tam) {
 unsigned long tiempoDesdeNotaMillis = 0;
 int notaMilli = 0;
 
+// Esta función hace lo mismo que sonar, pero funciona para vectores de tempo
+// en milisegundos en vez de tempo.
+
 void sonarEnMillis(int melodia[], int tempo[], int tam) {
   if (millis() - tiempoDesdeNotaMillis >= 1.5 * tempo[notaMilli]) {
     Esplora.tone(melodia[nota], tempo[nota]);
@@ -165,51 +175,61 @@ void sonarEnMillis(int melodia[], int tempo[], int tam) {
   }
 }
 
+// Esta funcion reinicia la cancion al principio de la misma, se invoca
+// al cambiar de desafío
+
 void resetCancion() {
   nota = 0;
 }
 
 //--------------------COMUNICACION BT-----------------------------
 // in
-const int SET_HORA = 0;
-const int SET_ALARMA = 1;
-const int SIG_DESAFIO = 2;
-const int INFO_DESAFIO = 3;
-const int APAGAR_ALARMA = 4;
+const char SET_HORA = '0';
+const char SET_ALARMA = '1';
+const char SIG_DESAFIO = '2';
+const char INFO_DESAFIO = '3';
+const char APAGAR_ALARMA = '4';
 
 void recibirMensaje() {
-  
-  String mensaje = bluetooth.readString();
-  Serial.println("<" + mensaje);
-  switch(mensaje.substring(0, 1).toInt()) {
-    case (INFO_DESAFIO):
-      actualizarInfoAndroid(mensaje.substring(1));
+  Serial.print("<-");
+  char mensaje = bluetooth.read();
+  Serial.println(mensaje);
+  switch(mensaje) {
+    case INFO_DESAFIO:
+      actualizarInfoAndroid();
       break;
-    case (SET_HORA):
-      setHora(mensaje.substring(1));
+    case SET_HORA:
+      setHora(bluetooth.readString());
       break;
-    case (SET_ALARMA):
-      setAlarma(mensaje.substring(1));
+    case SET_ALARMA:
+      setAlarma(bluetooth.readString());
       break;
-    case (SIG_DESAFIO):
-      tft.fillRect(0, 30, 320, 140, ILI9341_BLACK);
+    case SIG_DESAFIO:
       desafio++;
-      mandarOk();
       break;
-    case (APAGAR_ALARMA):
+    case APAGAR_ALARMA:
       inactivar();
       break;
   }
 }
-int largoMensaje = String("Pasadas: 10 - Giros: 10").length();
 
-void actualizarInfoAndroid(String mensaje) {
-  mensaje = mensaje.substring(mensaje.length() - largoMensaje);
-  tft.setCursor(30, 185);
+//int largoMensaje = String("Pasadas: 10 - Giros: 10").length();
+
+const int largoCadena = 24;
+char mensaje[largoCadena];
+
+void actualizarInfoAndroid() {
+  mensaje[largoCadena - 1] = '\0';
+  //mensaje = mensaje.substring(mensaje.length() - largoMensaje);
+  for (int i = 0; i < largoCadena - 1; i++) {
+    mensaje[i] = bluetooth.read();
+    Serial.println(mensaje[i] + " i");
+  }
+  Serial.println(mensaje);
+  tft.setCursor(20, 185);
   tft.setTextColor(ILI9341_BLUE, ILI9341_BLACK);
   tft.setTextSize(2);
   tft.print(mensaje);
-  mandarOk();
 }
 
 // out
@@ -217,31 +237,22 @@ void actualizarInfoAndroid(String mensaje) {
 const int ACTIVAR_SENSORES = 0;
 const int INFO_DESAFIO_BOTONES = 1;
 const int INFO_DESAFIO_MOVERSE = 2;
-const int ACK = 3;
 
-void mandarOk() {
-  Serial.println(">OK");
-  bluetooth.println(String(ACK));
-}
 
 void activarSensores() {
-  Serial.println(">Activar Sensores");
   bluetooth.println(String(ACTIVAR_SENSORES));
 }
 
 int botonCounter = 0;
 
 void enviarInfoBotones() {
-  String mensaje = String(INFO_DESAFIO_BOTONES) + "Boton: " + String(((botonCounter) + (repeticion * 4))) +
-      " de " + String(REPETICIONES * 4);
-  Serial.println(">" + mensaje);
-  bluetooth.println(mensaje);
+  bluetooth.println(String(INFO_DESAFIO_BOTONES) + "Boton: " + String(((botonCounter) + (repeticion * 4))) +
+      " de " + String(REPETICIONES * 4));
 }
 
 void enviarInfoMoverse() {
-  String mensaje = String(INFO_DESAFIO_MOVERSE) + "Repeticion: " + String(repeticion + 1) + " de " + String(REPETICIONES);
-  Serial.println(">" + mensaje);
-  bluetooth.println(mensaje);
+  bluetooth.println(String(INFO_DESAFIO_MOVERSE)
+    + "Repeticion: " + String(repeticion + 1) + " de " + String(REPETICIONES));
 }
 //----------------------------TIEMPO-------------------------
 
@@ -264,7 +275,7 @@ void dibujarHora() {
 void setHora(String hora) {
   setTime(hora.toInt());
   dibujarHora();
-  mandarOk();
+  
 }
 
 void setAlarma(String tiempo) {
@@ -280,7 +291,6 @@ void setAlarma(String tiempo) {
   tft.setCursor(110, 50);
   tft.setTextSize(3);
   tft.println(tiempo);
-  mandarOk();
 }
 
 void shuffle(int items[], int tam) {
@@ -294,15 +304,18 @@ void shuffle(int items[], int tam) {
 
 void activar() {
   activo = true;
-  tft.setCursor(110, 50);
-  tft.setTextSize(3);
-  tft.setTextColor(ILI9341_BLACK);
-  tft.println("AA:AA");
+  tft.fillRect(110, 50, 120, 25, ILI9341_BLACK);
 }
 
 void inactivar() {
+  desafio = BOTONES;
+  tft.fillRect(0, 0, 320, 240, ILI9341_BLACK);
+  androidStart = true;
+  dibujarHora();
+  dibujarTemp();
   activo = false;
-  tft.drawBitmap(270, 0, lampara, 50, 50, ILI9341_BLACK);
+  nota = 0;
+  Esplora.writeRGB(0, 0, 0);
 }
 
 void cambiar(int *n1, int *n2) {
@@ -330,6 +343,7 @@ void desafioBotones() {
     randomSeed(millis());
     shuffle(botones, 4);
     desafioBotonesStart = false;
+    Esplora.writeRGB(255,255,0);
     dibujarBotones(botones[botonCounter]);
   }
   if (Esplora.readButton(botones[botonCounter]) == LOW) {
@@ -443,6 +457,7 @@ void desafioMoverse() {
     tft.drawPixel(posJug[X], posJug[Y], ILI9341_WHITE);
     tft.drawRect(posObj[X], posObj[Y], 10, 10, ILI9341_MAGENTA);
     moverseStart = false;
+    Esplora.writeRGB(255, 0, 255);
   }
   if (millis() - moverseBuffer > 10) {
     moverseBuffer = millis();
@@ -500,7 +515,6 @@ void desafioMoverse() {
   }
 }
 
-bool androidStart = true;
 
 //ANDROID
 
@@ -508,15 +522,7 @@ void desafioAndroid() {
   if (androidStart) {
     activarSensores();
     androidStart = false;
-    tft.setCursor(0, 120);
-    tft.setTextSize(5);
-    tft.setTextColor(ILI9341_WHITE);
     tft.drawBitmap(110, 75, android, 100, 100, ILI9341_GREEN);
-  }
-  if (bluetooth.available()) {
-    bluetooth.readString();
-    desafio++;
-    resetCancion();
-    androidStart = true;
+    Esplora.writeRGB(0, 255, 0);
   }
 }

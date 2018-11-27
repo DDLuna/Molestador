@@ -121,19 +121,19 @@ const int starWarsTempo[] = {
   3, 7, 2,
 };
 
-const int peron[] = {
-  NOTE_E4, NOTE_C4, NOTE_A4, NOTE_E4,
-  NOTE_C4, NOTE_A4, NOTE_E4, NOTE_C4,
-  NOTE_E4, NOTE_C4, NOTE_A4, NOTE_E4, NOTE_E4,
-  NOTE_D4, NOTE_C4, NOTE_D4, NOTE_B4,
-};
-
-const int peronTempo[] = {
-  12, 12, 12, 12,
-  12, 12, 12, 12,
-  12, 12, 12, 6, 6,
-  12, 12, 12, 12,
-};
+//const int peron[] = {
+//  NOTE_E4, NOTE_C4, NOTE_A4, NOTE_E4,
+//  NOTE_C4, NOTE_A4, NOTE_E4, NOTE_C4,
+//  NOTE_E4, NOTE_C4, NOTE_A4, NOTE_E4, NOTE_E4,
+//  NOTE_D4, NOTE_C4, NOTE_D4, NOTE_B4,
+//};
+//
+//const int peronTempo[] = {
+//  12, 12, 12, 12,
+//  12, 12, 12, 12,
+//  12, 12, 12, 6, 6,
+//  12, 12, 12, 12,
+//};
 
 const int despacito[] = {
   NOTE_D5, NOTE_CS5, NOTE_B4, NOTE_FS4,
